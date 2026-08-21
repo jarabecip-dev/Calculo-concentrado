@@ -1,0 +1,6 @@
+{
+  "name": "Calculadora de Jarabe",
+  "description": "Calculadora de litros de jarabe por tamaño en CC y cantidad de botellas",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
