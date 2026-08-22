@@ -8,6 +8,13 @@ export const FLAVORS: FlavorCategory[] = [
   { id: 'SPZ', shortCode: 'SPZ', name: 'SPZ' },
   { id: 'SP_FX', shortCode: 'SP FX', name: 'SP FX' },
   { id: 'FN_FX', shortCode: 'FN FX', name: 'FN FX' },
+  { id: 'FNZ', shortCode: 'FNZ', name: 'FNZ' },
+  { id: 'SWT', shortCode: 'SWT', name: 'SWT' },
+  { id: 'SWPZ', shortCode: 'SWPZ', name: 'SWPZ' },
+  { id: 'CRN', shortCode: 'CRN', name: 'CRN' },
+  { id: 'CRLL', shortCode: 'CRLL', name: 'CRLL' },
+  { id: 'CRP', shortCode: 'CRP', name: 'CRP' },
+  { id: 'CRT', shortCode: 'CRT', name: 'CRT' },
 ];
 
 export const ALL_FACTORS: FactorItem[] = [
@@ -84,6 +91,31 @@ export const ALL_FACTORS: FactorItem[] = [
   { id: 'fn-fx-2000', flavorId: 'FN_FX', flavorName: 'FN FX', cc: 2000, factor: 0.367663, label: 'FN FX 2000 (2.0 L)' },
   { id: 'fn-fx-2250', flavorId: 'FN_FX', flavorName: 'FN FX', cc: 2250, factor: 0.413469, label: 'FN FX 2250 (2.25 L)' },
   { id: 'fn-fx-2500', flavorId: 'FN_FX', flavorName: 'FN FX', cc: 2500, factor: 0.459410, label: 'FN FX 2500 (2.5 L)' },
+
+  // FNZ
+  { id: 'fnz-500', flavorId: 'FNZ', flavorName: 'FNZ', cc: 500, factor: 0.09921825, label: 'FNZ 500 (500 ml)' },
+  { id: 'fnz-600', flavorId: 'FNZ', flavorName: 'FNZ', cc: 600, factor: 0.1190619, label: 'FNZ 600 (600 ml)' },
+  { id: 'fnz-1750', flavorId: 'FNZ', flavorName: 'FNZ', cc: 1750, factor: 0.347263, label: 'FNZ 1750 (1.75 L)' },
+
+  // SWT
+  { id: 'swt-350', flavorId: 'SWT', flavorName: 'SWT', cc: 350, factor: 0.04956, label: 'SWT 350 (350 ml)' },
+  { id: 'swt-1500', flavorId: 'SWT', flavorName: 'SWT', cc: 1500, factor: 0.212176, label: 'SWT 1500 (1.5 L)' },
+
+  // SWPZ
+  { id: 'swpz-350', flavorId: 'SWPZ', flavorName: 'SWPZ', cc: 350, factor: 0.078973, label: 'SWPZ 350 (350 ml)' },
+  { id: 'swpz-1500', flavorId: 'SWPZ', flavorName: 'SWPZ', cc: 1500, factor: 0.338063, label: 'SWPZ 1500 (1.5 L)' },
+
+  // CRN
+  { id: 'crn-2250', flavorId: 'CRN', flavorName: 'CRN', cc: 2250, factor: 0.348957, label: 'CRN 2250 (2.25 L)' },
+
+  // CRLL
+  { id: 'crll-2250', flavorId: 'CRLL', flavorName: 'CRLL', cc: 2250, factor: 0.348295, label: 'CRLL 2250 (2.25 L)' },
+
+  // CRP
+  { id: 'crp-2250', flavorId: 'CRP', flavorName: 'CRP', cc: 2250, factor: 0.348295, label: 'CRP 2250 (2.25 L)' },
+
+  // CRT
+  { id: 'crt-2250', flavorId: 'CRT', flavorName: 'CRT', cc: 2250, factor: 0.445254, label: 'CRT 2250 (2.25 L)' },
 ];
 
 export function getFactorsByFlavor(flavorId: string): FactorItem[] {
@@ -102,8 +134,9 @@ export function formatNumber(val: number, decimals: number = 2): string {
 }
 
 export function formatFactor(val: number): string {
+  // Show all relevant decimals (up to 8 decimal places for high precision factors like FNZ)
   return new Intl.NumberFormat('es-CL', {
     minimumFractionDigits: 6,
-    maximumFractionDigits: 6,
+    maximumFractionDigits: 8,
   }).format(val);
 }

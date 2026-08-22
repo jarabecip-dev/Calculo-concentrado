@@ -156,7 +156,7 @@ export default function App() {
                 <span>¿Cómo funciona el cálculo de jarabe por sabor?</span>
               </div>
               <p className="text-xs text-slate-600 leading-relaxed mb-3">
-                Cada sabor o línea (CC MA, CC SO, CCL, CCZ, SPZ, SP FX, FN FX) y tamaño en centímetros cúbicos (CC) tiene asignado un factor técnico de dosificación para calcular con exactitud los litros de jarabe terminado necesarios.
+                Cada sabor o línea (CC MA, CC SO, CCL, CCZ, SPZ, SP FX, FN FX, FNZ, SWT, SWPZ, CRN, CRLL, CRP, CRT) y tamaño en centímetros cúbicos (CC) tiene asignado un factor técnico de dosificación para calcular con exactitud los litros de jarabe terminado necesarios.
               </p>
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs space-y-1 font-mono text-slate-700">
                 <div className="font-bold text-slate-900 font-sans">Fórmula con contadores:</div>
@@ -167,7 +167,7 @@ export default function App() {
                   2. Litros Jarabe = Botellas Netas × Factor del Sabor y Formato
                 </div>
                 <div className="text-slate-500 text-[11px] font-sans pt-1">
-                  Ejemplo: 5.000 botellas de FN FX 1000 = 5.000 × 0,183967 = 919,835 Litros.
+                  Ejemplo: 5.000 botellas de FNZ 500 = 5.000 × 0,09921825 = 496,0913 Litros.
                 </div>
               </div>
             </div>
@@ -200,7 +200,7 @@ export default function App() {
             <span>— Control de dosificación, sabores y contadores</span>
           </div>
           <div className="text-slate-400 text-center sm:text-right">
-            Sabores: CC MA, CC SO, CCL, CCZ, SPZ, SP FX, FN FX
+            14 líneas: CC MA, CC SO, CCL, CCZ, SPZ, SP FX, FN FX, FNZ, SWT, SWPZ, CRN, CRLL, CRP, CRT
           </div>
         </div>
       </footer>
