@@ -18,20 +18,23 @@ export const CalculationHistory: React.FC<CalculationHistoryProps> = ({
 }) => {
   const exportToCSV = () => {
     if (records.length === 0) return;
-    const headers = ['Fecha', 'Hora', 'Tamaño (CC)', 'Factor Jarabe', 'Botellas', 'Total Litros Jarabe'];
+    const headers = ['Fecha', 'Hora', 'Sabor / Línea', 'Tamaño (CC)', 'Factor Jarabe', 'Contador Inicial', 'Contador Final', 'Botellas (Diferencia)', 'Total Litros Jarabe'];
     const rows = records.map((r) => {
       const d = new Date(r.timestamp);
       return [
         d.toLocaleDateString('es-CL'),
         d.toLocaleTimeString('es-CL'),
+        r.flavorName || 'CC MA',
         r.cc,
         r.factor,
+        r.initialCounter !== undefined ? r.initialCounter : '',
+        r.finalCounter !== undefined ? r.finalCounter : '',
         r.bottles,
         r.totalLiters.toFixed(4),
       ].join(';');
     });
 
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(';'), ...rows].join('\n');
+    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(';'), ...rows].join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
@@ -58,7 +61,7 @@ export const CalculationHistory: React.FC<CalculationHistoryProps> = ({
                 type="button"
                 onClick={exportToCSV}
                 title="Exportar a archivo CSV (Excel)"
-                className="text-xs text-slate-300 hover:text-white flex items-center gap-1 font-medium bg-slate-800 px-2.5 py-1 rounded-md border border-slate-700 transition-colors"
+                className="text-xs text-slate-300 hover:text-white flex items-center gap-1 font-medium bg-slate-800 px-2.5 py-1 rounded-md border border-slate-700 transition-colors cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
                 Exportar CSV
@@ -67,7 +70,7 @@ export const CalculationHistory: React.FC<CalculationHistoryProps> = ({
                 id="btn-clear-history"
                 type="button"
                 onClick={onClearHistory}
-                className="text-xs text-rose-300 hover:text-rose-100 flex items-center gap-1 font-medium px-2 py-1 transition-colors"
+                className="text-xs text-rose-300 hover:text-rose-100 flex items-center gap-1 font-medium px-2 py-1 transition-colors cursor-pointer"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 Borrar
@@ -92,9 +95,9 @@ export const CalculationHistory: React.FC<CalculationHistoryProps> = ({
               <thead className="bg-slate-100/80 text-slate-700 font-semibold border-b border-slate-200 uppercase tracking-wider text-[11px]">
                 <tr>
                   <th className="px-3 py-2">Fecha/Hora</th>
-                  <th className="px-3 py-2">Formato</th>
+                  <th className="px-3 py-2">Sabor & Formato</th>
                   <th className="px-3 py-2">Factor</th>
-                  <th className="px-3 py-2 text-right">Botellas</th>
+                  <th className="px-3 py-2 text-right">Botellas / Contadores</th>
                   <th className="px-3 py-2 text-right">Total Jarabe</th>
                   <th className="px-2 py-2 text-center">Acciones</th>
                 </tr>
@@ -105,19 +108,30 @@ export const CalculationHistory: React.FC<CalculationHistoryProps> = ({
                     hour: '2-digit',
                     minute: '2-digit',
                   });
+                  const hasCounters = r.initialCounter !== undefined && r.finalCounter !== undefined;
                   return (
                     <tr key={r.id} className="hover:bg-slate-50">
                       <td className="px-3 py-2 text-slate-500 font-mono text-[11px]">
                         {dateStr}
                       </td>
                       <td className="px-3 py-2 font-bold text-slate-900">
-                        CC {r.cc}
+                        <span className="text-[11px] font-semibold text-slate-600 mr-1">
+                          {r.flavorName || 'CC MA'}
+                        </span>
+                        <span>CC {r.cc}</span>
                       </td>
                       <td className="px-3 py-2 font-mono text-slate-600">
                         {formatFactor(r.factor)}
                       </td>
-                      <td className="px-3 py-2 text-right font-mono font-semibold text-slate-800">
-                        {formatNumber(r.bottles, 0)}
+                      <td className="px-3 py-2 text-right">
+                        <div className="font-mono font-semibold text-slate-800">
+                          {formatNumber(r.bottles, 0)}
+                        </div>
+                        {hasCounters && (
+                          <div className="text-[10px] text-slate-500 font-mono">
+                            {formatNumber(r.initialCounter!, 0)} → {formatNumber(r.finalCounter!, 0)}
+                          </div>
+                        )}
                       </td>
                       <td className="px-3 py-2 text-right font-mono font-bold text-amber-700">
                         {formatNumber(r.totalLiters, 4)} L
@@ -129,7 +143,7 @@ export const CalculationHistory: React.FC<CalculationHistoryProps> = ({
                             type="button"
                             onClick={() => onReuseRecord(r)}
                             title="Recargar en calculadora"
-                            className="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 hover:bg-amber-100 text-slate-700 hover:text-amber-900 rounded transition-colors"
+                            className="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 hover:bg-amber-100 text-slate-700 hover:text-amber-900 rounded transition-colors cursor-pointer"
                           >
                             Usar
                           </button>
@@ -137,7 +151,7 @@ export const CalculationHistory: React.FC<CalculationHistoryProps> = ({
                             id={`btn-delete-record-${r.id}`}
                             type="button"
                             onClick={() => onDeleteRecord(r.id)}
-                            className="text-slate-400 hover:text-rose-600 p-1 rounded transition-colors"
+                            className="text-slate-400 hover:text-rose-600 p-1 rounded transition-colors cursor-pointer"
                             title="Eliminar registro"
                           >
                             <Trash2 className="w-3.5 h-3.5" />

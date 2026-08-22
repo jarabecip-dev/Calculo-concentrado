@@ -10,19 +10,14 @@ import { FactorReferenceTable } from './components/FactorReferenceTable';
 import { BatchAccumulator } from './components/BatchAccumulator';
 import { CalculationHistory } from './components/CalculationHistory';
 import { CalculationRecord, BatchItem } from './types';
-import { STANDARD_FACTORS } from './data/factors';
+import { FLAVORS, ALL_FACTORS } from './data/factors';
 import { 
-  Calculator as CalcIcon, 
-  Table, 
-  Layers, 
-  History, 
   HelpCircle,
-  FileSpreadsheet,
-  CheckCircle,
   FlaskConical
 } from 'lucide-react';
 
 export default function App() {
+  const [selectedFlavorId, setSelectedFlavorId] = useState<string>('CC_MA');
   const [selectedCC, setSelectedCC] = useState<number>(1000);
   
   // Persistence for calculations history
@@ -70,7 +65,16 @@ export default function App() {
     setHistory((prev) => [newRecord, ...prev].slice(0, 50));
   };
 
-  const handleAddToBatch = (item: { cc: number; factor: number; bottles: number; totalLiters: number }) => {
+  const handleAddToBatch = (item: { 
+    flavorId: string;
+    flavorName: string;
+    cc: number; 
+    factor: number; 
+    bottles: number; 
+    totalLiters: number;
+    initialCounter?: number;
+    finalCounter?: number;
+  }) => {
     const newItem: BatchItem = {
       ...item,
       id: 'batch-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
@@ -99,8 +103,16 @@ export default function App() {
   };
 
   const handleReuseRecord = (record: CalculationRecord) => {
+    if (record.flavorId) {
+      setSelectedFlavorId(record.flavorId);
+    }
     setSelectedCC(record.cc);
-    // Scroll to top calculator
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSelectFlavorAndCC = (flavorId: string, cc: number) => {
+    setSelectedFlavorId(flavorId);
+    setSelectedCC(cc);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -117,6 +129,8 @@ export default function App() {
         {/* Main interactive calculator */}
         <section aria-label="Calculadora principal">
           <Calculator
+            selectedFlavorId={selectedFlavorId}
+            onSelectFlavorId={setSelectedFlavorId}
             selectedCC={selectedCC}
             onSelectCC={setSelectedCC}
             onSaveRecord={handleSaveRecord}
@@ -130,26 +144,30 @@ export default function App() {
           {/* Left / Main column: Factor Reference Table */}
           <section className="lg:col-span-6 space-y-6">
             <FactorReferenceTable
+              currentFlavorId={selectedFlavorId}
               currentCC={selectedCC}
-              onSelectCC={setSelectedCC}
+              onSelectFlavorAndCC={handleSelectFlavorAndCC}
             />
 
             {/* Quick explanation guide card */}
             <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm">
               <div className="flex items-center gap-2 text-slate-900 font-bold text-sm mb-2">
                 <HelpCircle className="w-4 h-4 text-amber-500" />
-                <span>¿Cómo funciona el cálculo de jarabe?</span>
+                <span>¿Cómo funciona el cálculo de jarabe por sabor?</span>
               </div>
               <p className="text-xs text-slate-600 leading-relaxed mb-3">
-                Cada tamaño de botella en centímetros cúbicos (CC) tiene asignado un factor técnico de dosificación que representa la cantidad exacta de litros de jarabe terminado necesarios por unidad producida.
+                Cada sabor o línea (CC MA, CC SO, CCL, CCZ, SPZ, SP FX, FN FX) y tamaño en centímetros cúbicos (CC) tiene asignado un factor técnico de dosificación para calcular con exactitud los litros de jarabe terminado necesarios.
               </p>
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs space-y-1 font-mono text-slate-700">
-                <div className="font-bold text-slate-900 font-sans">Fórmula aplicada:</div>
+                <div className="font-bold text-slate-900 font-sans">Fórmula con contadores:</div>
+                <div className="text-slate-600 font-sans text-[11px]">
+                  1. Botellas Netas = Contador Final - Contador Inicial
+                </div>
                 <div className="text-amber-800 font-bold">
-                  Litros Totales de Jarabe = Cantidad de Botellas × Factor
+                  2. Litros Jarabe = Botellas Netas × Factor del Sabor y Formato
                 </div>
                 <div className="text-slate-500 text-[11px] font-sans pt-1">
-                  Ejemplo: 5.000 botellas de CC 1000 = 5.000 × 0,154871 = 774,355 Litros de jarabe.
+                  Ejemplo: 5.000 botellas de FN FX 1000 = 5.000 × 0,183967 = 919,835 Litros.
                 </div>
               </div>
             </div>
@@ -179,10 +197,10 @@ export default function App() {
           <div className="flex items-center gap-2">
             <FlaskConical className="w-4 h-4 text-amber-400" />
             <span className="font-semibold text-slate-200">Calculadora de Jarabe</span>
-            <span>— Control de dosificación y embotellado</span>
+            <span>— Control de dosificación, sabores y contadores</span>
           </div>
           <div className="text-slate-400 text-center sm:text-right">
-            Factores estándar: CC 1000 a CC 3000
+            Sabores: CC MA, CC SO, CCL, CCZ, SPZ, SP FX, FN FX
           </div>
         </div>
       </footer>
