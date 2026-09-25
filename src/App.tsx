@@ -9,6 +9,7 @@ import { Calculator } from './components/Calculator';
 import { FactorReferenceTable } from './components/FactorReferenceTable';
 import { BatchAccumulator } from './components/BatchAccumulator';
 import { CalculationHistory } from './components/CalculationHistory';
+import { LoginScreen } from './components/LoginScreen';
 import { CalculationRecord, BatchItem } from './types';
 import { FLAVORS, ALL_FACTORS } from './data/factors';
 import { 
@@ -17,6 +18,25 @@ import {
 } from 'lucide-react';
 
 export default function App() {
+  // Authentication state
+  const [currentUser, setCurrentUser] = useState<string | null>(() => {
+    try {
+      const local = localStorage.getItem('jarabe_auth_session');
+      if (local) {
+        const parsed = JSON.parse(local);
+        if (parsed?.authenticated && parsed?.user) return parsed.user;
+      }
+      const session = sessionStorage.getItem('jarabe_auth_session');
+      if (session) {
+        const parsed = JSON.parse(session);
+        if (parsed?.authenticated && parsed?.user) return parsed.user;
+      }
+    } catch {
+      // ignore
+    }
+    return null;
+  });
+
   const [selectedFlavorId, setSelectedFlavorId] = useState<string>('CC_MA');
   const [selectedCC, setSelectedCC] = useState<number>(1000);
   
@@ -55,6 +75,20 @@ export default function App() {
       console.error(e);
     }
   }, [batchItems]);
+
+  const handleLoginSuccess = (user: string) => {
+    setCurrentUser(user);
+  };
+
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem('jarabe_auth_session');
+      sessionStorage.removeItem('jarabe_auth_session');
+    } catch (e) {
+      console.error(e);
+    }
+    setCurrentUser(null);
+  };
 
   const handleSaveRecord = (record: Omit<CalculationRecord, 'id' | 'timestamp'>) => {
     const newRecord: CalculationRecord = {
@@ -120,9 +154,18 @@ export default function App() {
     window.print();
   };
 
+  // If user is not authenticated, show login screen
+  if (!currentUser) {
+    return <LoginScreen onLoginSuccess={handleLoginSuccess} />;
+  }
+
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col font-sans antialiased selection:bg-amber-500 selection:text-slate-950">
-      <Navbar onPrint={handlePrint} />
+      <Navbar 
+        currentUser={currentUser}
+        onPrint={handlePrint} 
+        onLogout={handleLogout}
+      />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
         
@@ -207,3 +250,4 @@ export default function App() {
     </div>
   );
 }
+
